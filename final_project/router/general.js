@@ -28,7 +28,7 @@ public_users.get('/',async function (req, res) {
         if(books && Object.keys(books).length > 0){
           resolve(books);
         }else{
-          reject(new Error("No book is available in the shop!");)
+          reject(new Error("No book is available in the shop!"))
         }
       })
     }
@@ -85,8 +85,8 @@ public_users.get('/author/:author',async function (req, res) {
         })
       }
       
-      const books = await getBooks(author);
-      return res.status(200).send(JSON.stringify(books, null, 4));
+      const booksByAuthor = await getBooks(author);
+      return res.status(200).send(JSON.stringify(booksByAuthor, null, 4));
     }catch(err){
       return res.status(404).json({message: err.message});
     }
@@ -111,8 +111,8 @@ public_users.get('/title/:title',async function (req, res) {
         })
       }
       
-      const book = await getBook(title);
-      return res.status(200).send(JSON.stringify(book, null, 4));
+      const bookByTitle = await getBook(title);
+      return res.status(200).send(JSON.stringify(bookByTitle, null, 4));
     }catch(err){
       return res.status(404).json({message: err.message});
     }
@@ -137,8 +137,8 @@ public_users.get('/review/:isbn',async function (req, res) {
         })
       }
       
-      const reviews = await getReviews(isbn);
-      return res.status(200).send(JSON.stringify(reviews, null, 4));
+      const reviewsByBookISBN = await getReviews(isbn);
+      return res.status(200).send(JSON.stringify(reviewsByBookISBN, null, 4));
     }catch(err){
       return res.status(404).json({message: err.message});
     }
