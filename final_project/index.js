@@ -8,7 +8,7 @@ const app = express();
 
 app.use(express.json());
 
-app.use("/customer",session({secret:"fingerprint_customer",resave: true, saveUninitialized: true}))
+app.use("/customer",session({secret:"fingerprint_customer",resave: true, saveUninitialized: true, cookie: {secure: false, maxAge: 60*60*1000}}));
 
 app.use("/customer/auth/*", function (req,res,next){
     if(req.session.authorization){

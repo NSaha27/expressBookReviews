@@ -36,12 +36,8 @@ regd_users.post("/login", (req,res) => {
       return res.status(401).json({message: "Invalid Login data, check username and password!"});
     }
     const accessToken = jwt.sign({data: username}, "access", {expiresIn: 60*60});
-    if(req.session){
-      req.session.authorization = {
-        accessToken, username
-      };
-      return res.status(200).json({message: "User successfully logged in!", token: accessToken});
-    }
+    req.session.authorization = {accessToken, username};
+    return res.status(200).json({message: "User successfully logged in!"});
   }catch(err){
     return res.status(500).json({ message: "Internal server error." });
   }
@@ -65,7 +61,7 @@ regd_users.put("/auth/review/:isbn", (req, res) => {
       return res.status(401).json({message: "User not authenticated!"});
     }
   
-    const {review} = req.body;
+    const {review} = req.query;
     if(!review){
       return res.status(400).json({message: "Review text is required!"});
     }
@@ -73,7 +69,7 @@ regd_users.put("/auth/review/:isbn", (req, res) => {
     bookFound.reviews = bookFound.reviews || {};
     bookFound.reviews[loggedInUser] = review;
     books[isbn].reviews = bookFound.reviews;
-    return res.status(200).json({ message: "Review added/updated.", review: bookFound.reviews[loggedInUser] })
+    return res.status(200).json({ message: "Review added/updated." })
   }catch(err){
     return res.status(500).json({message: "Internal server error!"});
   }
