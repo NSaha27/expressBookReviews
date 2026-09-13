@@ -48,7 +48,7 @@ public_users.get('/isbn/:isbn',async function (req, res) {
       throw new Error("ISBN not found!");
     }
     
-    const bookFoundByISBN = (isbn) => {
+    const getBook = (isbn) => {
       return new Promise((resolve, reject) => {
         const isBookFound = books[isbn];
         if(isBookFound){
@@ -59,7 +59,7 @@ public_users.get('/isbn/:isbn',async function (req, res) {
       })
     }
     
-    const book = await bookFoundByISBN(isbn);
+    const book = await getBook(isbn);
     return res.status(200).send(JSON.stringify(book, null, 4));
   }catch(err){
     return res.status(404).json({message: err.message});
@@ -67,16 +67,29 @@ public_users.get('/isbn/:isbn',async function (req, res) {
  });
   
 // Get book details based on author
-public_users.get('/author/:author',function (req, res) {
-    const author = req.params.author;
-    if(!author){
-      return res.status(404).json({message: "Author not found!"});
+public_users.get('/author/:author',async function (req, res) {
+    try{
+      const author = req.params.author;
+      if(!author){
+        throw new Error("Author not found!");
+      }
+
+      const getBooks = (author) => {
+        return new Promise((resolve, reject) => {
+          const booksFound = Object.values(books).filter(book => book["author"] === author);
+          if(booksFound.length > 0){
+            resolve(booksFound);
+          }else{
+            reject(new Error(`No such book written by the author "${author}" is found!`))
+          }
+        })
+      }
+      
+      const books = await getBooks(author);
+      return res.status(200).send(JSON.stringify(books, null, 4));
+    }catch(err){
+      return res.status(404).json({message: err.message});
     }
-    const booksFound = Object.values(books).filter(book => book["author"] === author);
-    if(booksFound.length === 0){
-      return res.status(404).json({message: `No such book written by the author "${author}" is found!`});
-    }
-    return res.status(200).send(JSON.stringify(booksFound));
 });
 
 // Get all books based on title
