@@ -72,9 +72,40 @@ regd_users.put("/auth/review/:isbn", (req, res) => {
     
     bookFound.reviews = bookFound.reviews || {};
     bookFound.reviews[loggedInUser] = review;
-    return res.status(200).json({ message: "Review added/updated.", reviews: bookFound.reviews })
+    books[isbn].reviews = bookFound.reviews;
+    return res.status(200).json({ message: "Review added/updated.", review: bookFound.reviews[loggedInUser] })
   }catch(err){
     return res.status(500).json({message: "Internal server error!"});
+  }
+});
+
+// Delete a book review
+regd_users.delete("/auth/review/:isbn", (req, res) => {
+  try{
+    const isbn = req.params.isbn;
+    if(!isbn){
+      return res.status(400).json({message: "ISBN not found!"});
+    }
+  
+    const bookFound = books[isbn];
+    if(!bookFound){
+      return res.status(404).json({message: "No such book having this ISBN found!"});
+    }
+  
+    const loggedInUser = req.session?.authorization?.username;
+    if(!loggedInUser){
+      return res.status(401).json({message: "User not authenticated!"});
+    }
+
+    if(!Object.keys(bookFound.reviews).includes(loggedInUser)){
+      return res.status(400).json({message: "No review for this user is found, please add a review!"});
+    }
+
+    delete bookFound.reviews[loggedInUser];
+    books[isbn].reviews = bookFound.reviews;
+    return res.status(200).json({message: "Review successfully deleted!"});
+  }catch(err){
+      return res.status(500).json({message: "Internal server error!"});
   }
 });
 
