@@ -119,17 +119,29 @@ public_users.get('/title/:title',async function (req, res) {
 });
 
 //  Get book review
-public_users.get('/review/:isbn',function (req, res) {
-    const isbn = req.params.isbn;
-    if(!isbn){
-      return res.status(404).json({message: "ISBN not found!"});
+public_users.get('/review/:isbn',async function (req, res) {
+    try{
+      const isbn = req.params.isbn;
+      if(!isbn){
+        throw new Error("ISBN not found!");
+      }
+
+      const getReviews = (isbn) => {
+        return new Promise((resolve, reject) => {
+          const reviewsFound = books[isbn]["reviews"];
+          if(reviewsFound){
+            resolve(reviewsFound);
+          }else{
+            reject(new Error(`No review found for the book having the ISBN "${isbn}"!`))
+          }
+        })
+      }
+      
+      const reviews = await getReviews(isbn);
+      return res.status(200).send(JSON.stringify(reviews, null, 4));
+    }catch(err){
+      return res.status(404).json({message: err.message});
     }
-    const isbnFound = Object.keys(books).includes(isbn);
-    if(!isbnFound){
-      return res.status(404).json({message: `No such book having the ISBN "${isbn}" found!`});
-    }
-    const reviewsFound = books[isbn]["reviews"];
-    return res.status(200).send(JSON.stringify(reviewsFound));
 });
 
 module.exports.general = public_users;
