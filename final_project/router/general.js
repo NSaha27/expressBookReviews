@@ -93,16 +93,29 @@ public_users.get('/author/:author',async function (req, res) {
 });
 
 // Get all books based on title
-public_users.get('/title/:title',function (req, res) {
-    const title = req.params.title;
-    if(!title){
-      return res.status(404).json({message: "Title not found!"});
+public_users.get('/title/:title',async function (req, res) {
+    try{
+      const title = req.params.title;
+      if(!title){
+        throw new Error("Title not found!");
+      }
+
+      const getBook = (title) => {
+        return new Promise((resolve, reject) => {
+          const bookFound = Object.values(books).find(book => book["title"] === title);
+          if(bookFound){
+            resolve(bookFound);
+          }else{
+            reject(new Error(`No such book with the title "${title}" is found!`));
+          }
+        })
+      }
+      
+      const book = await getBook(title);
+      return res.status(200).send(JSON.stringify(book, null, 4));
+    }catch(err){
+      return res.status(404).json({message: err.message});
     }
-    const bookFound = Object.values(books).find(book => book["title"] === title);
-    if(!bookFound){
-      return res.status(404).json({message: `No such book with the title "${title}" is found!`});
-    }
-    return res.status(200).send(JSON.stringify(bookFound));
 });
 
 //  Get book review
