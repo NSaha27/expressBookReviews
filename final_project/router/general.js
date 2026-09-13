@@ -26,9 +26,9 @@ public_users.get('/',async function (req, res) {
     const getBooks = () => {
       return new Promise((resolve, reject) => {
         if(books && Object.keys(books).length > 0){
-          return resolve(books);
+          resolve(books);
         }else{
-          return reject(new Error("No book is available in the shop!");)
+          reject(new Error("No book is available in the shop!");)
         }
       })
     }
@@ -42,15 +42,28 @@ public_users.get('/',async function (req, res) {
 
 // Get book details based on ISBN
 public_users.get('/isbn/:isbn',async function (req, res) {
-  const isbn = req.params.isbn;
-  if(!isbn){
-    return res.status(404).json({message: "ISBN not found!"});
+  try{
+    const isbn = req.params.isbn;
+    if(!isbn){
+      throw new Error("ISBN not found!");
+    }
+    
+    const bookFoundByISBN = (isbn) => {
+      return new Promise((resolve, reject) => {
+        const isBookFound = books[isbn];
+        if(isBookFound){
+          resolve(books[isbn]);
+        }else{
+          reject(new Error("No such book with this ISBN is found!"));
+        }
+      })
+    }
+    
+    const book = await bookFoundByISBN(isbn);
+    return res.status(200).send(JSON.stringify(book, null, 4));
+  }catch(err){
+    return res.status(404).json({message: err.message});
   }
-  const isbnFound = Object.keys(books).includes(isbn);
-  if(!isbnFound){
-    return res.status(404).json({message: "No such book having this ISBN found!"});
-  }
-  return res.status(200).send(JSON.stringify(books[isbn]));
  });
   
 // Get book details based on author
