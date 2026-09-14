@@ -3,7 +3,7 @@
 
 This is a Book Review REST API capable of handling book-related operations, user interactions, authentication and review management. This API has been successfully tested using both Postman and cURL.
 
-###🔹 Key concepts and skills covered here...
+### Key concepts and skills covered here...
 - Node.js and Server-Side JavaScript
 - Node.js modules, require / imports and npm
 - Creating HTTP/Web servers with Node.js
