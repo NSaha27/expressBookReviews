@@ -1,5 +1,4 @@
 # Express Book Reviews App (A RESTful API Project)
----
 
 This is a Book Review REST API capable of handling book-related operations, user interactions, authentication and review management. This API has been successfully tested using both Postman and cURL.
 
